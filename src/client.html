@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rest Chat</title>
+        <style>
+            .scroll {
+            height: 350px; /* высота нашего блока */
+            width: 350px; /* ширина нашего блока */
+            background: #fff; /* цвет фона, белый */
+            border: 1px solid #C1C1C1; /* размер и цвет границы блока */
+            overflow-x: scroll; /* прокрутка по горизонтали */
+            overflow-y: scroll; /* прокрутка по вертикали */
+            }
+        </style>
+    </head>
+    <body style="background-color:rgb(255,240,230);">
+        <textarea class="scroll" disabled=disabled, name="messages" rows=2 cols=64></textarea>
+        <hr>
+        <textarea name="message"></textarea>
+        <button name="Send">Send</button>
+        <hr>
+        <button name="getAllUsers">Get all users</button>
+        <hr>
+        <button name="getOneUser">Get user</button>
+        <textarea name="getUserText"></textarea>
+        <hr>
+        <button name="exit">Exit</button>
+        <button name="execute">Execute</button>
+    </body>
+</html>
