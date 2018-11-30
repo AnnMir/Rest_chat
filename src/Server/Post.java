@@ -19,8 +19,8 @@ import static Common.Commons.SUCCESS_OK_CODE;
 
 public class Post {
     private static final String KEY_LOGIN = "/login";
-    private static final String KEY_LOGOUT = "/postLogout";
-    private static final String KEY_MESSAGES = "/messages";
+    private static final String KEY_LOGOUT = "/"+KEY_POST_LOGOUT;
+    private static final String KEY_MESSAGES = "/message";
     private static final String KEY_CONTENT_TYPE = "application/json";
 
     private ConcurrentHashMap<String, User> usersList;
@@ -43,7 +43,7 @@ public class Post {
         try {
             uri = new URI(requestData.getUri());
         } catch (URISyntaxException e) {
-            throw new RestException("", CLIENT_ERROR_METHOD_NOT_ALLOWED);
+            throw new RestException("Bad URI", CLIENT_ERROR_METHOD_NOT_ALLOWED);
         }
 
         switch (uri.getPath()) {
@@ -57,19 +57,20 @@ public class Post {
                 return postMessages(requestData);
             }
             default: {
-                throw new RestException("", CLIENT_ERROR_METHOD_NOT_ALLOWED);
+                throw new RestException("Wrong name of method", CLIENT_ERROR_METHOD_NOT_ALLOWED);
             }
         }
     }
 
     private String postLogin(RequestData request) throws RestException {
         if (!request.getContentType().equals(KEY_CONTENT_TYPE)) {
-            throw new RestException("", CLIENT_ERROR_BAD_REQUEST);
+            throw new RestException("ContentType is not application/json", CLIENT_ERROR_BAD_REQUEST);
         }
         JSONParser parser = new JSONParser();
         try {
             JSONObject jsonObj = (JSONObject) parser.parse(request.getMessage());
             String username = (String) jsonObj.get("username");
+            System.out.println(username);
             User userData;
             if (usersList.containsKey(username)) {
                 userData = usersList.get(username);
@@ -98,13 +99,13 @@ public class Post {
             requestHandler.setLastActingDate(new Date());
             return HttpParser.makeResponse(SUCCESS_OK_CODE, request.getContentType(), jsonMessage.toJSONString());
         } catch (ParseException e) {
-            throw new RestException("", CLIENT_ERROR_BAD_REQUEST);
+            throw new RestException("Parse exception while postLogin", CLIENT_ERROR_BAD_REQUEST);
         }
     }
 
     private String postLogout(RequestData request) throws RestException {
         if (!isUser(request.getToken())) {
-            throw new RestException("", CLIENT_ERROR_FORBIDDEN);
+            throw new RestException("Wrong token", CLIENT_ERROR_FORBIDDEN);
         }
         usersList.remove(currentName);
         requestHandler.setLogin(false);
@@ -117,15 +118,17 @@ public class Post {
 
     private String postMessages(RequestData request) throws RestException {
         if (!request.getContentType().equals(KEY_CONTENT_TYPE)) {
-            throw new RestException("", CLIENT_ERROR_BAD_REQUEST);
+            throw new RestException("ContentType is not application/json", CLIENT_ERROR_BAD_REQUEST);
         }
         if (!isUser(request.getToken())) {
-            throw new RestException("", CLIENT_ERROR_FORBIDDEN);
+            throw new RestException("Wrong token", CLIENT_ERROR_FORBIDDEN);
         }
         JSONParser parser = new JSONParser();
         try {
             JSONObject jsonObj = (JSONObject) parser.parse(request.getMessage());
             String message = (String) jsonObj.get("message");
+            if(message.equals(""))
+                throw new RestException("Empty message",CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
             Message message1 = new Message(messageList.size(), currentName, message);
             messageList.put(messageList.size(), message1);
             JSONObject jsonResponse = new JSONObject();
@@ -134,7 +137,7 @@ public class Post {
             requestHandler.setLastActingDate(new Date());
             return HttpParser.makeResponse(SUCCESS_OK_CODE, request.getContentType(), jsonResponse.toString());
         } catch (ParseException e) {
-            throw new RestException("", CLIENT_ERROR_BAD_REQUEST);
+            throw new RestException("Parse exception in postMessage", CLIENT_ERROR_BAD_REQUEST);
         }
     }
 

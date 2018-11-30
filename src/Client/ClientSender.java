@@ -101,11 +101,12 @@ public class ClientSender implements Runnable {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("message", msg);
 
-            String message = "POST /messages HTTP/1.1" + "\r\n"
+            String message = "POST /"+KEY_POST_MESSAGE+ " HTTP/1.1" + "\r\n"
                     + "Authorization: Token " + token + "\r\n"
                     + "Content-Type: application/json " + "\r\n"
                     + "\r\n"
                     + jsonObject.toJSONString() + "\r\n";
+            System.out.println("post message: "+message);
             bufferedWriter.write(message);
             bufferedWriter.flush();
         } catch (IOException e) {
@@ -118,7 +119,7 @@ public class ClientSender implements Runnable {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", name);
 
-            String message = "POST /login HTTP/1.1" + "\r\n"
+            String message = "POST /"+KEY_POST_LOGIN+" HTTP/1.1" + "\r\n"
                     + "Content-Type: application/json" + "\r\n"
                     + "\r\n"
                     + jsonObject.toJSONString() + "\r\n";
@@ -131,9 +132,10 @@ public class ClientSender implements Runnable {
 
     private void sendPostLogout() {
         try {
-            String message = "POST /postLogout HTTP/1.1" + "\r\n"
+            String message = "POST /"+KEY_POST_LOGOUT +" HTTP/1.1" + "\r\n"
                     + "Authorization: Token " + token + "\r\n"
                     + "\r\n";
+            System.out.println(message);
             bufferedWriter.write(message);
             bufferedWriter.flush();
         } catch (IOException e) {
@@ -143,7 +145,7 @@ public class ClientSender implements Runnable {
 
     private void sendGetOneUser(final String nameOrMessage) {
         try {
-            String message = "GET /users/" + nameOrMessage + " HTTP/1.1\r\n"
+            String message = "GET /"+KEY_GET_ONE_USER+nameOrMessage + " HTTP/1.1\r\n"
                     + "Authorization: Token " + token + "\r\n"
                     + "\r\n";
             bufferedWriter.write(message);
@@ -155,7 +157,7 @@ public class ClientSender implements Runnable {
 
     private void sendGetAllUsers() {
         try {
-            String message = "GET /users HTTP/1.1" + "\r\n"
+            String message = "GET /"+ KEY_GET_ALL_USERS+" HTTP/1.1" + "\r\n"
                     + "Authorization: Token " + token + "\r\n"
                     + "\r\n";
             bufferedWriter.write(message);
@@ -167,7 +169,7 @@ public class ClientSender implements Runnable {
 
     private void sendGetAllMessages(String numberOfMessage) {
         try {
-            String message = "GET /messages?offset=" + numberOfMessage + "&count=10" + " HTTP/1.1\r\n"
+            String message = "GET /"+KEY_GET_MESSAGES+"?offset=" + numberOfMessage + "&count=10" + " HTTP/1.1\r\n"
                     + "Authorization: Token " + token + "\r\n"
                     + "\r\n";
             bufferedWriter.write(message);

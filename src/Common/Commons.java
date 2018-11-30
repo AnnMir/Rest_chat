@@ -7,15 +7,16 @@ public final class Commons {
     public final static int CLIENT_ERROR_FORBIDDEN = 403;
     public final static int CLIENT_ERROR_NOT_FOUND = 404;
     public final static int CLIENT_ERROR_METHOD_NOT_ALLOWED = 405;
+    public final static int CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE = 416;
     public final static int SERVER_ERROR = 500;
 
     public final static String KEY_POST_LOGIN = "login";
     public final static String KEY_POST_LOGOUT = "logout";
-    public final static String KEY_POST_MESSAGE = "messages";
+    public final static String KEY_POST_MESSAGE = "message";
 
-    public final static String KEY_GET_ONE_USER = "get/one_user";
-    public final static String KEY_GET_ALL_USERS = "get/users";
-    public final static String KEY_GET_MESSAGES = "get/allmessages";
+    public final static String KEY_GET_ONE_USER = "users/";
+    public final static String KEY_GET_ALL_USERS = "users";
+    public final static String KEY_GET_MESSAGES = "messages";
 
     public static final int BUF_SIZE = 16 * 1024;
     public static final int TIMEOUT_PERIOD = 50000;

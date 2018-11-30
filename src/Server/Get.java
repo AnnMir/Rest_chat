@@ -16,8 +16,8 @@
     import static Common.Commons.CLIENT_ERROR_FORBIDDEN;
 
     public class Get {
-        private static final String MESSAGES_PATH = "/messages";
-        private static final String USERS_PATH = "/users";
+        private static final String MESSAGES_PATH = "/"+KEY_GET_MESSAGES;
+        private static final String USERS_PATH = "/"+KEY_GET_ALL_USERS;
 
         private ConcurrentHashMap<String, User> usersList;
         private ConcurrentHashMap<Integer, Message> messageList;
@@ -39,7 +39,7 @@
             try {
                 uri = new URI(requestData.getUri());
             } catch (URISyntaxException e) {
-                throw new RestException("", CLIENT_ERROR_METHOD_NOT_ALLOWED);
+                throw new RestException("Wrong URI", CLIENT_ERROR_METHOD_NOT_ALLOWED);
             }
             String path = uri.getPath();
             System.out.println(path);
@@ -55,10 +55,10 @@
                     System.out.println(dirs[0]);
                     System.out.println(dirs[1]);
                     System.out.println(dirs[2]);
-                    if (dirs[1].equals("users") && Integer.parseInt(dirs[2]) > -1) {
+                    if (dirs[1].equals("users")) {
                         return getOneUser(requestData, dirs[2]);
                     } else {
-                        throw new RestException("", CLIENT_ERROR_METHOD_NOT_ALLOWED);
+                        throw new RestException("Unknown method", CLIENT_ERROR_METHOD_NOT_ALLOWED);
                     }
                 }
             }
@@ -66,7 +66,7 @@
 
         private String getUsers(RequestData request) throws RestException {
             if (!isUser(request.getToken())) {
-                throw new RestException("", CLIENT_ERROR_FORBIDDEN);
+                throw new RestException("Wrong token", CLIENT_ERROR_FORBIDDEN);
             }
             JSONArray jsonMessageList = new JSONArray();
             for (Map.Entry<String, User> entry : usersList.entrySet()) {
@@ -89,16 +89,23 @@
 
         private String getOneUser(RequestData request, String user) throws RestException {
             if (!isUser(request.getToken())) {
-                throw new RestException("", CLIENT_ERROR_FORBIDDEN);
+                throw new RestException("Wrong token", CLIENT_ERROR_FORBIDDEN);
             }
             User userData = null;
+            try{
+                int id = Integer.valueOf(user);
+            }catch (NumberFormatException e){
+                throw new RestException("It's not a number",CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+            }
+            if(Integer.parseInt(user)<1)
+                throw new RestException("Wrong number",CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
             for (Map.Entry<String, User> entry : usersList.entrySet()) {
                 if (entry.getValue().getUserID() == Integer.parseInt(user)) {
                     userData = entry.getValue();
                 }
             }
             if (userData == null) {
-                throw new RestException("", CLIENT_ERROR_NOT_FOUND);
+                throw new RestException("User not found", CLIENT_ERROR_NOT_FOUND);
             }
             JSONObject jsonMessage = new JSONObject();
             jsonMessage.put("id", userData.getUserID());
@@ -114,7 +121,7 @@
 
         private String getMessages(RequestData request) throws RestException {
             if (!isUser(request.getToken())) {
-                throw new RestException("", CLIENT_ERROR_FORBIDDEN);
+                throw new RestException("Wrong token", CLIENT_ERROR_FORBIDDEN);
             }
             try {
                 URI uri = new URI(request.getUri());
@@ -140,7 +147,7 @@
                 return HttpParser.makeResponse(SUCCESS_OK_CODE, request.getContentType(), result.toString());
 
             } catch (URISyntaxException e) {
-                throw new RestException("", CLIENT_ERROR_BAD_REQUEST);
+                throw new RestException("Bad URI", CLIENT_ERROR_BAD_REQUEST);
             }
         }
 
@@ -151,7 +158,7 @@
                 String rightToken = usersList.get(currentName).getUserToken().toString();
                 return rightToken.equals(token);
             } else {
-                throw new RestException("", CLIENT_ERROR_FORBIDDEN);
+                throw new RestException("Unknown user", CLIENT_ERROR_FORBIDDEN);
             }
         }
     }

@@ -45,15 +45,15 @@ public class ClientReceiver implements Runnable {
                 byte[] bytes = new byte[BUF_SIZE];
                 isEnd = bufferedReader.read(bytes);
                 if (isEnd < 0) {
-                    view.updateChat("Server left");
+                    view.updateChat("Connection completed with code -1");
                     view.successLogout();
                     break;
                 }
-                String httpRequest = new String(bytes, "UTF-8");
-                parseHttp(httpRequest);
+                String httpResponse = new String(bytes, "UTF-8");
+                parseHttp(httpResponse);
             }
         } catch (final IOException e) {
-            view.updateChat("Server left");
+            view.updateChat("Connection completed. Successful logout");
             view.successLogout();
             try {
                 bufferedReader.close();
@@ -84,7 +84,7 @@ public class ClientReceiver implements Runnable {
         if (numberOfStrings != endOfRequestHeaders) {
             int endPoint = messageStrings[numberOfStrings - 1].indexOf("\u0000");
             String jsonString = messageStrings[numberOfStrings - 1].substring(0, endPoint);
-            decodeToJsonRequestBody(jsonString);
+            decodeToJsonResponseBody(jsonString);
         }
         responseHandle();
     }
@@ -121,7 +121,7 @@ public class ClientReceiver implements Runnable {
                 }
             }
         } else {
-            showResponseMessage("Warning");
+            showResponseMessage("Response code is not 200");
         }
     }
 
@@ -152,7 +152,7 @@ public class ClientReceiver implements Runnable {
         responseHeaders.put(splitHeader[0], splitHeader[1]);
     }
 
-    private void decodeToJsonRequestBody(final String requestBody) {
+    private void decodeToJsonResponseBody(final String requestBody) {
         if (requestBody.equals("")) {
             return;
         }
